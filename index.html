@@ -23,9 +23,11 @@
     --radius:16px;
     --shadow:0 4px 18px rgba(74,9,18,.08);
   }
-  *{box-sizing:border-box;margin:0;padding:0}
+  :root{color-scheme:light}
+  *{box-sizing:border-box;margin:0;padding:0;min-width:0}
   html{-webkit-text-size-adjust:100%}
   body{
+    overflow-x:clip;
     font-family:"Rubik","Assistant","Heebo","Segoe UI",Arial,sans-serif;
     background:var(--cream);
     color:var(--ink);
@@ -305,10 +307,10 @@
       <div class="amount" id="summaryTotal">₪0</div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-wa" id="waBtn" type="button">
+      <a class="btn btn-wa" id="waBtn" href="#" target="_blank" rel="noopener" style="text-decoration:none">
         <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1-.7-.3-1.4-.7-2-1.3-.6-.5-1-1.1-1.4-1.8-.1-.2 0-.4.1-.5l.4-.4.3-.5v-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3c-.3.3-1 .9-1 2.3s1 2.7 1.2 2.9c.1.2 2 3.1 4.9 4.3 1.8.8 2.5.8 3.4.7.6-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.6-.3Z"/></svg>
         שליחת הזמנה לוואטסאפ
-      </button>
+      </a>
       <button class="btn btn-copy" id="copyBtn" type="button">📋 העתקת סיכום הזמנה</button>
     </div>
   </section>
@@ -570,16 +572,20 @@
         .catch(function(){ toast("לא ניתן להעתיק – נסו שוב"); });
     });
 
-    $("waBtn").addEventListener("click", function(){
+    // הקישור מתעדכן ממש לפני הלחיצה (pointerdown) וגם בלחיצה עצמה
+    function refreshWa(){
+      $("waBtn").href = "https://wa.me/" + (CFG.whatsappNumber || "") + "?text=" + encodeURIComponent(buildMessage());
+    }
+    $("waBtn").addEventListener("pointerdown", refreshWa);
+    $("waBtn").addEventListener("click", function(e){
       if(!selected().length){
+        e.preventDefault();
         toast("נא לבחור לפחות פריט אחד");
         $("menu").scrollIntoView({ behavior: "smooth" });
         return;
       }
-      if(!validate()) return;
-      var url = "https://wa.me/" + (CFG.whatsappNumber || "") + "?text=" + encodeURIComponent(buildMessage());
-      var w = window.open(url, "_blank");
-      if(!w) location.href = url;
+      if(!validate()){ e.preventDefault(); return; }
+      refreshWa();
     });
 
     $("bbBtn").addEventListener("click", function(){
