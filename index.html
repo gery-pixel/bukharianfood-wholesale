@@ -607,6 +607,14 @@
 
   // ---------- הפעלה ----------
   renderMenu();
+  if(!MENU.length){
+    $("menu").innerHTML =
+      '<div class="card" style="text-align:center;border-color:#c0392b">' +
+        '<h2 style="color:#c0392b">התפריט לא נטען</h2>' +
+        '<p>הקובץ <b dir="ltr">menu.js</b> לא נמצא. יש לשמור אותו באותה תיקייה עם <b dir="ltr">index.html</b>, ' +
+        'בשם <b dir="ltr">menu.js</b> בדיוק, ולפתוח את הדף מחדש.</p>' +
+      "</div>";
+  }
   load();
   Object.keys(qty).forEach(updateRow);
   bind();
